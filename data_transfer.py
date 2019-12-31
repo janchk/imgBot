@@ -1,0 +1,104 @@
+import pickle
+import os
+import mimetypes
+
+import requests
+import shutil
+from datetime import datetime
+
+from googleapiclient.discovery import build
+from google_auth_oauthlib.flow import InstalledAppFlow
+from google.auth.transport.requests import Request
+from googleapiclient.http import MediaFileUpload
+
+
+SCOPES = ['https://www.googleapis.com/auth/drive']
+
+class DataHandler:
+    def __init__(self):
+        self.folder_id = None
+        self.drive = None
+
+        self.__upload_init()
+        self.__folder_init()
+        
+
+
+    def upload(self, data):
+        """
+        """
+        # content = data.attachments[0]
+        for d_file in data:
+
+            attc_content = d_file.attachments[0]
+            r = requests.get(attc_content.url, stream=True)
+            
+            orig_ext = attc_content.filename.split('.')[1]
+            filename = str(d_file.id) + "." + orig_ext
+
+            with open(filename ,'wb') as out_file:
+                shutil.copyfileobj(r.raw, out_file)
+            # file_drive = drive.CreateFile({'title':d_file.filename})
+
+            file_metadata = {'name':filename, 'parents':[self.folder_id]}
+            media = MediaFileUpload(filename, mimetype=mimetypes.guess_extension(filename))
+            file = self.drive.files().create(body=file_metadata, media_body=media, fields='id').execute()
+            os.remove(filename)
+
+
+    
+    def __upload_init(self):
+        """Shows basic usage of the Drive v3 API.
+        Prints the names and ids of the first 10 files the user has access to.
+        """
+        creds = None
+        # The file token.pickle stores the user's access and refresh tokens, and is
+        # created automatically when the authorization flow completes for the first
+        # time.
+        if os.path.exists('credentials/token.pickle'):
+            with open('credentials/token.pickle', 'rb') as token:
+                creds = pickle.load(token)
+        # If there are no (valid) credentials available, let the user log in.
+        if not creds or not creds.valid:
+            if creds and creds.expired and creds.refresh_token:
+                creds.refresh(Request())
+            else:
+                flow = InstalledAppFlow.from_client_secrets_file(
+                    'credentials/credentials.json', SCOPES)
+                creds = flow.run_local_server()
+            # Save the credentials for the next run
+            with open('credentials/token.pickle', 'wb') as token:
+                pickle.dump(creds, token)
+
+        self.drive = build('drive', 'v3', credentials=creds)
+
+
+
+    def __folder_init(self):
+        folder_name = str(datetime.date(datetime.now()))
+        page_token = None
+        file_metadata = {
+        'name': folder_name,
+        'mimeType': 'application/vnd.google-apps.folder'}
+        while True:
+            rsp = self.drive.files().list(q="mimeType='application/vnd.google-apps.folder' and name = '{}'".format(folder_name), 
+                                            spaces='drive',  
+                                            fields='nextPageToken, files(id, name)',
+                                            pageToken=page_token).execute()
+            try:
+                file = rsp.get('files',[])[0]
+                if (folder_name == file['name']):
+                # Process change
+                    self.folder_id = file.get('id')
+                    print ('Found file: %s (%s)' % (file.get('name'), file.get('id')))
+                    break
+            except IndexError:
+                pass
+            page_token = rsp.get('nextPageToken', None)
+            if page_token is None:
+                file = self.drive.files().create(body=file_metadata,fields='id').execute()
+                self.folder_id = file.get('id')
+                break
+        pass
+
+
