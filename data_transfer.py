@@ -4,8 +4,8 @@ import mimetypes
 
 import requests
 import shutil
-from datetime import datetime
 
+from datetime import datetime
 from common.checker import file_ext_checker
 
 from googleapiclient.discovery import build
@@ -39,15 +39,21 @@ class DataHandler:
             
             orig_ext = attc_content.filename.split('.')[1]
             filename = str(d_file.id) + "." + orig_ext
+            mimetype = mimetypes.guess_type(filename)[0]
 
-            with open(filename ,'wb') as out_file:
-                shutil.copyfileobj(r.raw, out_file)
-            # file_drive = drive.CreateFile({'title':d_file.filename})
+            file_pres = file_ext_checker(self.drive, filename, mimetype)
 
-            file_metadata = {'name':filename, 'parents':[self.folder_id]}
-            media = MediaFileUpload(filename, mimetype=mimetypes.guess_extension(filename))
-            file = self.drive.files().create(body=file_metadata, media_body=media, fields='id').execute()
-            os.remove(filename)
+            if (not file_pres):
+                with open(filename ,'wb') as out_file:
+                    shutil.copyfileobj(r.raw, out_file)
+                # file_drive = drive.CreateFile({'title':d_file.filename})
+
+                file_metadata = {'name':filename, 'parents':[self.folder_id]}
+                media = MediaFileUpload(filename, mimetype=mimetype)
+                file = self.drive.files().create(body=file_metadata, media_body=media, fields='id').execute()
+                os.remove(filename)
+            else:
+                pass
 
 
     

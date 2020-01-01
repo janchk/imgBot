@@ -18,9 +18,9 @@ class BotBehaviour:
         await ctx.send('https://drive.google.com/drive/folders/1agXJUagpMYhwHSRTf0MpjvSlGcFwfIGt?usp=sharing')
         # pass
 
-    @bot.command()
+    @bot.command(pass_context=True)
     # @log_function
-    async def ping(ctx):
+    async def ping(ctx, nums: int):
         # await asyncio.sleep(2)
         await ctx.send('pong')
         channel = ctx.message.channel
@@ -32,12 +32,14 @@ class BotBehaviour:
                 pass
                 # print(elem.content)
 
-    @bot.command()
+    @bot.command(pass_context=True)
     # @log_function
-    async def upload(ctx):
+    async def upload(ctx, mAmount: int):
+        if (not mAmount):
+            mAmount = 1
         dhandler = DataHandler()
         channel = ctx.message.channel
-        messages = await channel.history(limit=100).flatten()
+        messages = await channel.history(limit=mAmount).flatten()
         await ctx.send("BOT STATUS: 'Started uploading...'")
         for i, elem in enumerate(messages):
             if elem.attachments:
