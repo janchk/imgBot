@@ -18,18 +18,6 @@ if os.path.exists('credentials/discord_credentials.txt'):
 SCOPES = ['https://www.googleapis.com/auth/drive']
 
 client = discord.Client()
-# http = urllib3.PoolManager()
-# bot = commands.Bot(command_prefix='$', description='A bot that greets the user back.')
-# def log_function(func):
-#     @wraps(func)
-#     async def wrapped_func(ctx):
-#         print("\nexecuting %s" %func.__name__)
-#         print("\nargs is %s" %ctx)
-#         await asyncio.sleep(1)
-#         func(ctx)
-#     return wrapped_func
-
-# bot = commands.Bot(command_prefix='!')
 
 bot_behaviour = bot_commands.BotBehaviour()
 bot = bot_behaviour.bot_init()

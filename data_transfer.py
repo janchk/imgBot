@@ -6,6 +6,8 @@ import requests
 import shutil
 from datetime import datetime
 
+from common.checker import file_ext_checker
+
 from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
@@ -18,8 +20,10 @@ class DataHandler:
     def __init__(self):
         self.folder_id = None
         self.drive = None
+        self.root_folder_id = None
 
         self.__upload_init()
+        self.__get_root_folder_id()
         self.__folder_init()
         
 
@@ -76,29 +80,33 @@ class DataHandler:
 
     def __folder_init(self):
         folder_name = str(datetime.date(datetime.now()))
-        page_token = None
+        mimeType = 'application/vnd.google-apps.folder'
         file_metadata = {
         'name': folder_name,
-        'mimeType': 'application/vnd.google-apps.folder'}
-        while True:
-            rsp = self.drive.files().list(q="mimeType='application/vnd.google-apps.folder' and name = '{}'".format(folder_name), 
-                                            spaces='drive',  
-                                            fields='nextPageToken, files(id, name)',
-                                            pageToken=page_token).execute()
-            try:
-                file = rsp.get('files',[])[0]
-                if (folder_name == file['name']):
-                # Process change
-                    self.folder_id = file.get('id')
-                    print ('Found file: %s (%s)' % (file.get('name'), file.get('id')))
-                    break
-            except IndexError:
-                pass
-            page_token = rsp.get('nextPageToken', None)
-            if page_token is None:
-                file = self.drive.files().create(body=file_metadata,fields='id').execute()
-                self.folder_id = file.get('id')
-                break
-        pass
+        'mimeType': mimeType,
+        'parents':[self.root_folder_id]}
 
+        folder_pres = file_ext_checker(self.drive, folder_name, mimeType )
 
+        if (not folder_pres):
+            file = self.drive.files().create(body=file_metadata,fields='id').execute()
+            self.folder_id = file.get('id')
+        else:
+            self.folder_id = folder_pres
+
+    def __get_root_folder_id(self):
+        folder_name = "EVR_PHOTOS"
+        mimeType = 'application/vnd.google-apps.folder'
+        file_metadata = {
+        'name': folder_name,
+        'mimeType': mimeType}
+
+        folder_pres = file_ext_checker(self.drive, folder_name, mimeType )
+
+        if (not folder_pres):
+            file = self.drive.files().create(body=file_metadata,fields='id').execute()
+            self.root_folder_id = file.get('id')
+        else:
+            self.root_folder_id = folder_pres
+        
+        

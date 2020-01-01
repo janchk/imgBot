@@ -14,6 +14,11 @@ class BotBehaviour:
         return bot
 
     @bot.command()
+    async def link(ctx):
+        await ctx.send('https://drive.google.com/drive/folders/1agXJUagpMYhwHSRTf0MpjvSlGcFwfIGt?usp=sharing')
+        # pass
+
+    @bot.command()
     # @log_function
     async def ping(ctx):
         # await asyncio.sleep(2)
@@ -29,16 +34,12 @@ class BotBehaviour:
 
     @bot.command()
     # @log_function
-    async def download(ctx):
-        # await asyncio.sleep(2)
-        # await ctx.send('pong')
+    async def upload(ctx):
         dhandler = DataHandler()
         channel = ctx.message.channel
         messages = await channel.history(limit=100).flatten()
-        await ctx.send("BOT STATUS: 'Started downloading...'")
+        await ctx.send("BOT STATUS: 'Started uploading...'")
         for i, elem in enumerate(messages):
-            # await ctx.message.delete()
-            # await client.delete_message("{} from {} are downloaded".format(i, 100))
             if elem.attachments:
                 data = []
                 data.append(elem)
@@ -47,4 +48,4 @@ class BotBehaviour:
                 pass
                 # data = None
                 # print(elem.content)
-        await ctx.send("BOT STATUS: 'Download complete'")
+        await ctx.send("BOT STATUS: 'Upload complete'")
