@@ -37,7 +37,7 @@ class DataHandler:
             attc_content = d_file.attachments[0]
             r = requests.get(attc_content.url, stream=True)
             
-            orig_ext = attc_content.filename.split('.')[1]
+            orig_ext = attc_content.filename.split('.')[-1]
             filename = str(d_file.id) + "." + orig_ext
             mimetype = mimetypes.guess_type(filename)[0]
 
