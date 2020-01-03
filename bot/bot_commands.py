@@ -3,7 +3,7 @@ from discord.ext import commands
 
 from data_transfer import DataHandler
 
-bot = commands.Bot(command_prefix='!')
+bot = commands.Bot(command_prefix='isbot-')
 
 class BotBehaviour:
     def __init__(self):
@@ -15,12 +15,12 @@ class BotBehaviour:
 
     @bot.command()
     async def link(ctx):
-        await ctx.send('https://drive.google.com/drive/folders/1agXJUagpMYhwHSRTf0MpjvSlGcFwfIGt?usp=sharing')
+        await ctx.send('https://drive.google.com/open?id=1z1Wzbg1MrAY1AUkw-i5Lf3teVDVqXDs9')
         # pass
 
     @bot.command(pass_context=True)
     # @log_function
-    async def ping(ctx, nums: int):
+    async def ping(ctx, nums: int=1):
         # await asyncio.sleep(2)
         await ctx.send('pong')
         channel = ctx.message.channel
@@ -34,7 +34,7 @@ class BotBehaviour:
 
     @bot.command(pass_context=True)
     # @log_function
-    async def upload(ctx, mAmount: int):
+    async def upload(ctx, mAmount: int=1):
         if (not mAmount):
             mAmount = 1
         dhandler = DataHandler()
