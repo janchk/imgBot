@@ -35,9 +35,9 @@ class BotBehaviour:
     @bot.command(pass_context=True)
     # @log_function
     async def upload(ctx, mAmount: int=1):
+        dhandler = DataHandler() # don't like idea of initing Datahandler every time
         if (not mAmount):
             mAmount = 1
-        dhandler = DataHandler()
         channel = ctx.message.channel
         messages = await channel.history(limit=mAmount).flatten()
         await ctx.send("BOT STATUS: 'Started uploading...'")

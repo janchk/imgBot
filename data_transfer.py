@@ -10,6 +10,7 @@ from common.checker import file_ext_checker
 
 from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
+from google.oauth2 import service_account
 from google.auth.transport.requests import Request
 from googleapiclient.http import MediaFileUpload
 
@@ -25,7 +26,9 @@ class DataHandler:
         self.__upload_init()
         self.__get_root_folder_id()
         self.__folder_init()
-        
+    
+    def __del__(self):
+        pass
 
 
     def upload(self, data):
@@ -69,13 +72,19 @@ class DataHandler:
             with open('credentials/token.pickle', 'rb') as token:
                 creds = pickle.load(token)
         # If there are no (valid) credentials available, let the user log in.
-        if not creds or not creds.valid:
+        if not creds: # or not creds.valid:
             if creds and creds.expired and creds.refresh_token:
                 creds.refresh(Request())
-            else:
+            elif (os.path.exists('credentials/credentials.json')):
                 flow = InstalledAppFlow.from_client_secrets_file(
                     'credentials/credentials.json', SCOPES)
                 creds = flow.run_local_server()
+            elif os.environ['GDRIVE_CREDENTIALS']:
+                cred_var = os.environ['GDRIVE_CREDENTIALS']
+                with open('credentials/service_credentials.json', 'w+') as cred_file:
+                    cred_file.write(cred_var)
+                creds = service_account.Credentials.from_service_account_file("credentials/service_credentials.json", scopes=SCOPES) 
+
             # Save the credentials for the next run
             with open('credentials/token.pickle', 'wb') as token:
                 pickle.dump(creds, token)

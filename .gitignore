@@ -1,6 +1,8 @@
 *__pycache__
 .vscode
 credentials.json
+service_credentials.json
 token.pickle
+*pickle_bak
 discord_credentials.txt
 venv
