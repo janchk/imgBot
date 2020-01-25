@@ -14,6 +14,8 @@ from data_transfer import DataHandler
 if os.path.exists('credentials/discord_credentials.txt'):
             with open('credentials/discord_credentials.txt', 'r') as token:
                 TOKEN = token.read()
+elif os.environ['DISCORD_CREDENTIALS']:
+    TOKEN = os.environ['DISCORD_CREDENTIALS'] 
 
 SCOPES = ['https://www.googleapis.com/auth/drive']
 
@@ -33,6 +35,8 @@ async def on_ready():
 
 @bot.event
 async def on_message(message):
+    await bot.process_commands(message)
+    print(message)
     if message.attachments:
         dhandler.upload([message])
 

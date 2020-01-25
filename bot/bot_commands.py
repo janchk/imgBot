@@ -15,7 +15,7 @@ class BotBehaviour:
 
     @bot.command()
     async def link(ctx):
-        await ctx.send('https://drive.google.com/open?id=1z1Wzbg1MrAY1AUkw-i5Lf3teVDVqXDs9')
+        await ctx.send('https://drive.google.com/open?id=1slsUDw3PkTnekU9r7AQ7g9Swo6aHQxAv')
         # pass
 
     @bot.command(pass_context=True)
@@ -51,3 +51,4 @@ class BotBehaviour:
                 # data = None
                 # print(elem.content)
         await ctx.send("BOT STATUS: 'Upload complete'")
+

@@ -51,7 +51,8 @@ class DataHandler:
                     shutil.copyfileobj(r.raw, out_file)
                 # file_drive = drive.CreateFile({'title':d_file.filename})
 
-                file_metadata = {'name':filename, 'parents':[self.folder_id]}
+                # file_metadata = {'name':filename, 'parents':[self.folder_id]}
+                file_metadata = {'name':filename, 'parents':[self.root_folder_id]}
                 media = MediaFileUpload(filename, mimetype=mimetype)
                 file = self.drive.files().create(body=file_metadata, media_body=media, fields='id').execute()
                 os.remove(filename)
@@ -123,5 +124,16 @@ class DataHandler:
             self.root_folder_id = file.get('id')
         else:
             self.root_folder_id = folder_pres
-        
-        
+    
+    def __share_folder(self, email, role='writer'):
+        """
+        roles = 'writer', 'commenter', 'reader'
+        """
+        file_id = self.root_folder_id
+        user_permission = {
+            'type': 'user', 
+            'role': role,
+            'emailAddress': email
+        }
+        command = self.drive.permissions().create(fileId=file_id, body=user_permission, fields='id')
+        command.execute
