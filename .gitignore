@@ -4,5 +4,6 @@ credentials.json
 service_credentials.json
 token.pickle
 *pickle_bak
+bot/data/watched_channels.json
 discord_credentials.txt
 venv

@@ -1,27 +1,24 @@
 # Work with Python 3.6
 import discord
 import asyncio
-# import urllib3
 import requests
 from discord.ext import commands
 from functools import wraps
 
-import os
+from credentials.get_credentials import get_discord_creds
+
 
 from bot import bot_commands
+from bot.bot_globals import WatchedChannels
 from data_transfer import DataHandler
 
-if os.path.exists('credentials/discord_credentials.txt'):
-            with open('credentials/discord_credentials.txt', 'r') as token:
-                TOKEN = token.read()
-elif os.environ['DISCORD_CREDENTIALS']:
-    TOKEN = os.environ['DISCORD_CREDENTIALS'] 
-
+ 
+TOKEN = get_discord_creds()
 SCOPES = ['https://www.googleapis.com/auth/drive']
 
 client = discord.Client()
-
 dhandler = DataHandler()
+watched_channels = WatchedChannels()
 
 bot_behaviour = bot_commands.BotBehaviour()
 bot = bot_behaviour.bot_init()
@@ -36,8 +33,9 @@ async def on_ready():
 @bot.event
 async def on_message(message):
     await bot.process_commands(message)
-    print(message)
-    if message.attachments:
-        dhandler.upload([message])
+    if (message.channel.id in watched_channels.data):
+        print(message)
+        if message.attachments:
+            dhandler.upload([message])
 
 bot.run(TOKEN)

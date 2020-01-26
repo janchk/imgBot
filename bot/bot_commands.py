@@ -2,8 +2,10 @@ import discord
 from discord.ext import commands
 
 from data_transfer import DataHandler
+from bot.bot_globals import WatchedChannels
 
 bot = commands.Bot(command_prefix='isbot-')
+w_channels = WatchedChannels()
 
 class BotBehaviour:
     def __init__(self):
@@ -48,7 +50,12 @@ class BotBehaviour:
                 dhandler.upload(data)
             else:
                 pass
-                # data = None
-                # print(elem.content)
         await ctx.send("BOT STATUS: 'Upload complete'")
+    
+    @bot.command()
+    async def watch(ctx):
+        channel = ctx.message.channel
+        w_channels.data.append(channel.id)
+        w_channels.save()
+        await ctx.send("BOT STATUS: 'Watching this channel...'")
 
