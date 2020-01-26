@@ -9,8 +9,7 @@ from common.checker import file_ext_checker
 from credentials.get_credentials import get_gdrive_creds
 
 from googleapiclient.discovery import build
-from google_auth_oauthlib.flow import InstalledAppFlow
-from google.oauth2 import service_account
+
 from google.auth.transport.requests import Request
 from googleapiclient.http import MediaFileUpload
 
